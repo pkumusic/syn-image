@@ -1,10 +1,11 @@
 # Project for 11777
 import matplotlib as plot
-from scipy import misc
+from PIL import Image
 
 def load_image(path):
-    image = misc.imread(path)
-    print image
+    im = Image.open(path).convert('RGB')
+    #im.show()
+    return im
 
 
 if __name__ == "__main__":
