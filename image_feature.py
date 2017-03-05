@@ -22,7 +22,7 @@ if __name__ == "__main__":
     #Perform transform
     transform = transforms.Compose([
         transforms.Scale(224),
-        transforms.RandomHorizontalFlip(),
+        # transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         # transforms.Normalize(mean=[0.485, 0.456, 0.406],
         #                      std=[0.229, 0.224, 0.225]),
@@ -34,5 +34,5 @@ if __name__ == "__main__":
     image.resize_((1,)+image.size())
 
     image = Variable(image)
-    feature = model.forward(image, until_layer='4')
+    feature = model.forward(image, until_layer='fc')
     print feature
