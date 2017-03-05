@@ -135,7 +135,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x, until_layer='fc'):
-        assert until_layer in ['4','fc']
+        assert until_layer in ['3','4','fc']
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -144,6 +144,8 @@ class ResNet(nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
+        if until_layer == '3':
+            return x
         x = self.layer4(x)
         if until_layer == '4':
             return x
