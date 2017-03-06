@@ -13,7 +13,8 @@ import argparse
 # TODO: implement a dataset class for flowers
 def main(args):
     data_folder = 'data/102flowers/'
-    labels = load_labels(data_folder + 'imagelabels_10class.txt')
+    labels = load_labels(data_folder + 'imagelabels.txt')
+    #  labels = load_labels(data_folder + 'imagelabels_10class.txt')
     n = len(labels)
     print 'total number: ', n
     # Model initialization
@@ -34,8 +35,9 @@ def main(args):
         label = labels[i]
 
         # Perform transform
+        image = image.resize((224,224))
         transform = transforms.Compose([
-            transforms.Scale(224),
+            # transforms.Scale((224)),
             transforms.ToTensor(),
         ])
         # transform = transforms.ToTensor()
