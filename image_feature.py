@@ -75,65 +75,54 @@ def flowers(args):
     np.save('fc_conv3_res152', conv3s)
     np.save('fc_conv4_res152', conv4s)
 
-# def birds(args):
-#     data_folder = 'data/CUB_200_2011/CUB_200_2011'
-#     folders = glob.glob(data_folder + '/images/*')
-#     label = 0
-#     image_label_pairs = []
-#     for folder in folders:
-#         label += 1
-#         image_paths = glob.glob(folder + '/*')
-#         for image_path in image_paths:
-#             image = load_image(image_path)
-#             image_label_pairs.append((label, image))
-#     print image_label_pairs
-#
-#     labels = load_labels(data_folder + 'imagelabels.txt')
-#     #  labels = load_labels(data_folder + 'imagelabels_10class.txt')
-#     n = len(labels)
-#     print 'total number: ', n
-#     # Model initialization
-#     features = []
-#     model = resnet152(pretrained=True)
-#     # alexnet = models.alexnet()
-#     # vgg16 = models.vgg16()
-#     if torch.cuda.is_available():
-#         if not args.cuda:
-#             print("WARNING: You have a CUDA device, so you should probably run with --cuda")
-#         else:
-#             model = model.cuda()
-#     for i in xrange(n):
-#         #if i % 100 == 0:
-#         print i
-#         # Load image from file
-#         image = load_image(data_folder + 'jpg/image_%.5d.jpg'%(i+1))
-#         label = labels[i]
-#
-#         # Perform transform
-#         image = image.resize((224,224))
-#         transform = transforms.Compose([
-#             # transforms.Scale((224)),
-#             transforms.ToTensor(),
-#         ])
-#         # transform = transforms.ToTensor()
-#         image = transform(image)
-#         #  save_image(image, 'test.jpg')
-#
-#         image.resize_((1,) + image.size())
-#
-#         if args.cuda:
-#             image = image.cuda()
-#         image = Variable(image)
-#         if args.cuda:
-#             feature = model.forward(image, until_layer='fc').data.cpu().numpy()
-#         else:
-#             feature = model.forward(image, until_layer='fc').data.numpy()
-#         #print feature
-#         #print feature.shape
-#         #exit()
-#         features.append(feature)
-#     features = np.concatenate(features, axis=0)
-#     np.save('fc_features_res152', features)
+def birds(args):
+    data_folder = 'data/CUB_200_2011/CUB_200_2011'
+    folders = glob.glob(data_folder + '/images/*')
+    label = 0
+    labels = []
+    features = []
+    model = resnet152(pretrained=True)
+    if torch.cuda.is_available():
+        if not args.cuda:
+            print("WARNING: You have a CUDA device, so you should probably run with --cuda")
+        else:
+            model = model.cuda()
+    i = 0
+    for folder in folders:
+        label += 1
+        image_paths = glob.glob(folder + '/*')
+        for image_path in image_paths:
+            i += 1
+            print i
+            image = load_image(image_path)
+            feature = extract_feature(model, image, args)
+            labels.append(label)
+            features.append(feature)
+    f = open('bird_labels','w')
+    f.write(','.join(map(str,labels)))
+    features = np.concatenate(features, axis=0)
+    np.save('fc_features_res152.bird', features)
+
+def extract_feature(model, image, args):
+    image = image.resize((224, 224))
+    transform = transforms.Compose([
+        # transforms.Scale((224)),
+        transforms.ToTensor(),
+    ])
+    # transform = transforms.ToTensor()
+    image = transform(image)
+    #  save_image(image, 'test.jpg')
+
+    image.resize_((1,) + image.size())
+
+    if args.cuda:
+        image = image.cuda()
+    image = Variable(image)
+    if args.cuda:
+        feature = model.forward(image, until_layer='fc').data.cpu().numpy()
+    else:
+        feature = model.forward(image, until_layer='fc').data.numpy()
+    return feature
 
 def extract(args):
 
@@ -189,8 +178,8 @@ if __name__ == "__main__":
     parser.add_argument('--cuda', action='store_true', help='use CUDA')
     args = parser.parse_args()
     #  extract(args)
-    flowers(args)
-    #birds(args)
+    #flowers(args)
+    birds(args)
     #visualize_filter()
 
 
