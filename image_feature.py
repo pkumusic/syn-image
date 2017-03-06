@@ -54,9 +54,9 @@ def flowers(args):
         image = Variable(image)
         if args.cuda:
             feature = model.forward(image, until_layer='fc').data.cpu().numpy()
-            conv3 = model.forward(image, until_layer='3').data.cpu.numpy()
+            conv3 = model.forward(image, until_layer='3').data.cpu().numpy()
             conv3 = conv3.reshape(1,-1)
-            conv4 = model.forward(image, until_layer='4').data.cpu.numpy()
+            conv4 = model.forward(image, until_layer='4').data.cpu().numpy()
             conv4 = conv4.reshape(1,-1)
         else:
             feature = model.forward(image, until_layer='fc').data.numpy()
