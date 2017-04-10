@@ -10,6 +10,7 @@ def get_parser(parser):
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
     parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
     parser.add_argument('--imageSize', type=int, default=64, help='the height / width of the input image to network')
+    parser.add_argument('--cnnDim', type=int, default=256, help='dimension of the CNN text encoder')
     parser.add_argument('--nc', type=int, default=3, help='number of channel for the input image')
     parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
     parser.add_argument('--ngf', type=int, default=64)
@@ -23,6 +24,7 @@ def get_parser(parser):
     parser.add_argument('--netD', default='', help="path to netD (to continue training)")
     parser.add_argument('--outf', default='./checkpoints', help='folder to output images and model checkpoints')
     parser.add_argument('--manualSeed', type=int, default=123, help='manual seed')
+    parser.add_argument('--tensorboardPath', type=str, default='./runs', help='path for the tensorboard logger')
     return parser
 
 def get_data(args, train_flag=True):
