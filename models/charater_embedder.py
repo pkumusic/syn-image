@@ -6,9 +6,9 @@ import torch.nn as nn
 
 # CNN/RNN TextEncoder
 class TextEncoder(nn.Module):
-    def __init__(self, alphasize, cnn_dim, embed_dim):
+    def __init__(self, alphasize, cnn_dim, embed_dim, word_dim):
         super(TextEncoder, self).__init__()
-        self.cnn = TextEncoderCNN(alphasize, cnn_dim)
+        self.cnn = TextEncoderCNN(alphasize, cnn_dim, word_dim)
         self.rnn = TextEncoderRNN(cnn_dim, embed_dim)
 
     def forward(self, input):
@@ -22,11 +22,13 @@ class TextEncoder(nn.Module):
         return output
 
 class TextEncoderCNN(nn.Module):
-    def __init__(self, alphasize, cnn_dim):
+    def __init__(self, alphasize, cnn_dim, word_dim):
         super(TextEncoderCNN, self).__init__()
+        self.emb = nn.Embedding(alphasize, word_dim)
         # -- alphasize x 201 (201 is the imagined dimension of the sentence)
         self.main = nn.Sequential(
-            nn.Conv1d(alphasize, 384, 4),
+            # nn.Conv1d(alphasize, 384, 4),
+            nn.Conv1d(word_dim, 384, 4),
             nn.Threshold(1e-6, 0),
             nn.MaxPool1d(3, 3),
             # -- 384 x 66
@@ -35,14 +37,16 @@ class TextEncoderCNN(nn.Module):
             nn.MaxPool1d(3, 3),
             # -- 512 x 21
             nn.Conv1d(512, cnn_dim, 4),
-            nn.Threshold(1e-6, 0),
-            nn.MaxPool1d(3, 2))
+            nn.Threshold(1e-6, 0))
+            # nn.MaxPool1d(3, 2))
             # -- cnn_dim x 8
     def forward(self, input):
+        # print 'prev input', input.size()
         # TODO: since no temporal available, use the transpose and Conv1D operation
+        input = self.emb.forward(input)
         input = torch.transpose(input, 1, 2)
         # output: batch x cnn_dim x reduced_seq_len
-        return self.main(input)
+        return self.main.forward(input)
 
 
 class TextEncoderRNN(nn.Module):

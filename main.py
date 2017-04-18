@@ -48,27 +48,34 @@ if __name__ == "__main__":
         print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
     # Get data
-    trn_dataset = util.get_data(opt, train_flag=True)
-    trn_loader = torch.utils.data.DataLoader(trn_dataset,
-                                             batch_size=opt.batchSize,
-                                             shuffle=True,
-                                             num_workers=int(opt.workers))
+    trn_loader = util.get_data(opt, train_flag=True)
 
-    # dataloader = torch.utils.data.DataLoader(dataset, batch_size=opt.batchSize,
-    #                                          shuffle=True, num_workers=int(opt.workers))
-    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789-,;.!?:'\"/\\|_@#$%^&*~`+-=<>()[]{} "
-    alpha_num = len(alphabet)
+    alpha_num = len(util.alphabet)
     cnnDim = opt.cnnDim
     netG, netD = DCGAN(opt)
-    netText = TextEncoder(alpha_num, cnnDim, opt.nz)
+    netText = TextEncoder(alpha_num, cnnDim, opt.nz, opt.wordDim)
 
-    # # test
-    # test_data = torch.FloatTensor(10, 201, alpha_num)
-    # # print 'test_data size', test_data.size()
-    # test_data_var = Variable(test_data)
-    # output = netText(test_data_var)
+    # ## test
+    # batch = trn_loader.getbatch(0)
+    # # print batch[0]
+    # outputs = []
+    # for test_data in batch[0][1]:
+    #     # print batch[0][1]
+    #     # print test_data.size(), test_data.size(1)
+    #
+    #     # expand_test_data = torch.LongTensor(1, 201)
+    #     # expand_test_data[:,:test_data.size(1)] = test_data
+    #     # test_data = expand_test_data
+    #
+    #     test_data_var = Variable(test_data)
+    #     output = netText(test_data_var)
+    #     outputs.append(output)
+    # # output = torch.cat(outputs, dim=0)
+    # output = torch.cat(outputs, 0)
+    # output = torch.sum(output, dim=0)
     # print(output.size())
     # raw_input()
+    # ## end test
 
     criterion = nn.BCELoss()
 
@@ -103,15 +110,22 @@ if __name__ == "__main__":
     optimizerD = optim.Adam(netD.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
     optimizerG = optim.Adam(netG.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
 
+    len_trn = len(trn_loader)
+    num_batch = len_trn // trn_loader.batch_size
+    # num_batch = 60  # TEST
     # training process
     for epoch in range(opt.niter):
-        for i, data in enumerate(trn_loader, 0):
+        for i in xrange(num_batch):
+            data = trn_loader.getbatch(i)
+            real_cpu, _ = trn_loader.strip_batch(data)
+            real_cpu = torch.cat(real_cpu, 0)
+        # for i, data in enumerate(trn_loader, 0):
             ############################
             # (1) Update D network: maximize log(D(x)) + log(1 - D(G(z)))
             ###########################
             # train with real
             netD.zero_grad()
-            real_cpu, _ = data
+            # real_cpu, _ = data
             batch_size = real_cpu.size(0)
             input.data.resize_(real_cpu.size()).copy_(real_cpu)
             label.data.resize_(batch_size).fill_(real_label)
