@@ -15,7 +15,7 @@ from torch.autograd import Variable
 
 import util
 from model_interface import DCGAN
-from models.charater_embedder import TextEncoder
+#  from models.charater_embedder import TextEncoder
 
 from tensorboard_logger import configure, log_value
 
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     alpha_num = len(alphabet)
     cnnDim = opt.cnnDim
     netG, netD = DCGAN(opt)
-    netText = TextEncoder(alpha_num, cnnDim, opt.nz)
+    #  netText = TextEncoder(alpha_num, cnnDim, opt.nz)
 
     # # test
     # test_data = torch.FloatTensor(10, 201, alpha_num)
