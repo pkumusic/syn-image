@@ -18,7 +18,7 @@ def get_parser(parser):
     parser.add_argument('--dataset', required=True, help='cifar10 | lsun | imagenet | folder | lfw ')
     parser.add_argument('--dataroot', required=True, help='path to dataset')
     parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
-    parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
+    parser.add_argument('--batchSize', type=int, default=4, help='input batch size')
     parser.add_argument('--imageSize', type=int, default=64, help='the height / width of the input image to network')
     parser.add_argument('--wordDim', type=int, default=100, help='dimension of the word embedding')
     parser.add_argument('--cnnDim', type=int, default=256, help='dimension of the CNN text encoder')
