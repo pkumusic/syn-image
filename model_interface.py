@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import torch
-from models import dcgan
+from models import dcgan, wgan
 
 def grad_norm(m, norm_type=2):
     total_norm = 0.0
@@ -32,6 +32,23 @@ def DCGAN(args):
         netG.load_state_dict(torch.load(args.netG))
 
     netD = dcgan._netD(args)
+    netD.apply(weights_init)
+
+    # load D model
+    if args.netD != '':
+        netD.load_state_dict(torch.load(args.netD))
+
+    return netG, netD
+
+def WGAN(args):
+    netG = wgan._netG(args)  # TODO: without BN
+    netG.apply(weights_init)
+
+    # load G model
+    if args.netG != '':
+        netG.load_state_dict(torch.load(args.netG))
+
+    netD = wgan._netD(args)
     netD.apply(weights_init)
 
     # load D model

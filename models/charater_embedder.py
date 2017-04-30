@@ -3,6 +3,7 @@
 
 import torch
 import torch.nn as nn
+from torch.autograd import Variable
 
 # CNN/RNN TextEncoder
 class TextEncoder(nn.Module):
@@ -46,6 +47,17 @@ class TextEncoderCNN(nn.Module):
         input = self.emb.forward(input)
         input = torch.transpose(input, 1, 2)
         # output: batch x cnn_dim x reduced_seq_len
+        # print input.size()
+        min_size = 50
+        if input.size(2) < min_size: # TODO: padding, should be something -1
+            # print 'get here'
+            zeros = torch.zeros(input.size(0), input.size(1), min_size - input.size(2))
+            if input.is_cuda:
+                zeros = zeros.cuda()
+            zeros = Variable(zeros)
+            # print input.size(), zeros.size()
+            input = torch.cat([input, zeros], 2)
+            # print input.size()
         return self.main.forward(input)
 
 
